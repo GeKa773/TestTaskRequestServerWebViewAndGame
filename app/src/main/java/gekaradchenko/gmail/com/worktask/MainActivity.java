@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     private final String MAIN_ACTIVITY = "mainActivity";
 
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,13 +69,15 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(MainActivity.this, "FALSE", Toast.LENGTH_SHORT).show();
 
                 firstRun.edit().putString("wasActivityWorking", GAME_ACTIVITY);
+                intent = new Intent(MainActivity.this, GameActivity.class);
+                startActivity(intent);
             } else Toast.makeText(MainActivity.this, "BEDA", Toast.LENGTH_SHORT).show();
 
         }
 
         @Override
         protected String doInBackground(String... strings) {
-            String bool = getBool(PATH_TRUE);
+            String bool = getBool(PATH);
 
             return bool;
         }
@@ -126,6 +129,7 @@ public class MainActivity extends AppCompatActivity {
 
         } else if (firstRun.getString("wasActivityWorking", MAIN_ACTIVITY).equals(GAME_ACTIVITY)) {
             System.out.println("GameAcitvtiy +>>>>>>>>>>>>>>>>>>");
+            startActivity(new Intent(MainActivity.this, GameActivity.class));
 
         }
 
