@@ -9,22 +9,24 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.webkit.CookieManager;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
 public class WebViewActivity extends AppCompatActivity {
     private WebView webView;
-    private static final String PATH = "http://html5test.com/";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_web_view);
         webView = findViewById(R.id.webView);
-        webView.loadUrl(PATH);
+        webView.loadUrl(getString(R.string.html_site));
         webView.getSettings().setJavaScriptEnabled(true);
+        webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
         WebViewClient webViewClient = new WebViewClient() {
 
             @Override
@@ -54,9 +56,8 @@ public class WebViewActivity extends AppCompatActivity {
     // Делаем первый запуск
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Toast.makeText(this, "ajaahhaha", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(WebViewActivity.this, MainActivity.class);
-        intent.putExtra("isFirstStart",true);
+        intent.putExtra("isFirstStart", true);
         startActivity(intent);
         return super.onOptionsItemSelected(item);
     }

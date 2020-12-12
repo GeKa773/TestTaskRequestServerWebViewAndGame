@@ -1,6 +1,5 @@
 package gekaradchenko.gmail.com.worktask;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -8,7 +7,6 @@ import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.io.BufferedReader;
@@ -21,19 +19,13 @@ import javax.net.ssl.HttpsURLConnection;
 
 public class MainActivity extends AppCompatActivity {
     private SharedPreferences firstRun;
-    private final String FIRST_RUN = "first_run";
-    private final String WEB_VIEW_ACTIVITY = "vebViewActivity";
-    private final String GAME_ACTIVITY = "gameActivity";
-    private final String MAIN_ACTIVITY = "mainActivity";
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        firstRun = getSharedPreferences(FIRST_RUN, MODE_PRIVATE);
+        firstRun = getSharedPreferences(getString(R.string.first_run), MODE_PRIVATE);
 
         // Сделать первый запуск
         Bundle bundle = getIntent().getExtras();
@@ -42,33 +34,26 @@ public class MainActivity extends AppCompatActivity {
                 firstRun.edit().putBoolean("firstRun", true).commit();
             }
         }
-
         wasActivityWorking();
         isFirstRun();
-
     }
 
     // Получаем ответ от сервера
     private class GetServerAsyncTask extends AsyncTask<String, Void, String> {
-        public static final String PATH = "https://java-test-server.herokuapp.com/";
-        public static final String PATH_FALSE = "https://java-test-server.herokuapp.com/false";
-        public static final String PATH_TRUE = "https://java-test-server.herokuapp.com/true";
         private Intent intent;
 
         @Override
         protected void onPostExecute(String bool) {
             super.onPostExecute(bool);
-            System.out.println(bool + "   >>>>>>>>>>>>>>>");
             if (bool.trim().equals("true")) {
-                firstRun.edit().putString("wasActivityWorking", WEB_VIEW_ACTIVITY).commit();
+                firstRun.edit().putString("wasActivityWorking", getString(R.string.veb_view_activity)).commit();
+                Toast.makeText(MainActivity.this, "TRUE", Toast.LENGTH_SHORT).show();
                 intent = new Intent(MainActivity.this, WebViewActivity.class);
                 startActivity(intent);
 
             } else if (bool.trim().equals("false")) {
-                firstRun.edit().putString("wasActivityWorking", GAME_ACTIVITY);
+                firstRun.edit().putString("wasActivityWorking", getString(R.string.game_activity)).commit();
                 Toast.makeText(MainActivity.this, "FALSE", Toast.LENGTH_SHORT).show();
-
-                firstRun.edit().putString("wasActivityWorking", GAME_ACTIVITY);
                 intent = new Intent(MainActivity.this, GameActivity.class);
                 startActivity(intent);
             } else Toast.makeText(MainActivity.this, "BEDA", Toast.LENGTH_SHORT).show();
@@ -77,13 +62,13 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected String doInBackground(String... strings) {
-            String bool = getBool(PATH);
+            String bool = getResult(getString(R.string.path));
 
             return bool;
         }
 
         // Получение ответа от сервера
-        private String getBool(String path) {
+        private String getResult(String path) {
             try {
                 URL url = new URL(path);
                 HttpsURLConnection connection = (HttpsURLConnection) url.openConnection();
@@ -110,7 +95,6 @@ public class MainActivity extends AppCompatActivity {
     private void isFirstRun() {
         if (firstRun.getBoolean("firstRun", true)) {
             new GetServerAsyncTask().execute();
-
             wasActivityWorking();
             firstRun.edit().putBoolean("firstRun", false).commit();
         }
@@ -119,18 +103,16 @@ public class MainActivity extends AppCompatActivity {
 
     // Проверка на поледнее запущенное приложение
     private void wasActivityWorking() {
-        if (firstRun.getString("wasActivityWorking", MAIN_ACTIVITY).equals(MAIN_ACTIVITY)) {
-            System.out.println("MainActivity +>>>>>>>>>>>>>>>>>>");
+        if (firstRun.getString("wasActivityWorking", getString(R.string.main_activity))
+                .equals(getString(R.string.main_activity))) {
 
-        } else if (firstRun.getString("wasActivityWorking", MAIN_ACTIVITY).equals(WEB_VIEW_ACTIVITY)) {
-            System.out.println("WebView +>>>>>>>>>>>>>>>>>>");
+        } else if (firstRun.getString("wasActivityWorking", getString(R.string.main_activity))
+                .equals(getString(R.string.veb_view_activity))) {
             startActivity(new Intent(MainActivity.this, WebViewActivity.class));
 
-
-        } else if (firstRun.getString("wasActivityWorking", MAIN_ACTIVITY).equals(GAME_ACTIVITY)) {
-            System.out.println("GameAcitvtiy +>>>>>>>>>>>>>>>>>>");
+        } else if (firstRun.getString("wasActivityWorking", getString(R.string.main_activity))
+                .equals(getString(R.string.game_activity))) {
             startActivity(new Intent(MainActivity.this, GameActivity.class));
-
         }
 
     }

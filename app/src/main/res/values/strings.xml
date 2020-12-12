@@ -1,3 +1,11 @@
 <resources>
     <string name="app_name">WorkTask</string>
+    <string name="first_run">first_run</string>
+    <string name="veb_view_activity">vebViewActivity</string>
+    <string name="game_activity">gameActivity</string>
+    <string name="main_activity">mainActivity</string>
+    <string name="path">https://java-test-server.herokuapp.com/</string>
+    <string name="path_false">https://java-test-server.herokuapp.com/false</string>
+    <string name="path_true">https://java-test-server.herokuapp.com/true</string>
+    <string name="html_site">http://html5test.com/</string>
 </resources>

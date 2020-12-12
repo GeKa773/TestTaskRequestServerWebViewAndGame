@@ -2,7 +2,10 @@ package gekaradchenko.gmail.com.worktask;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.Observer;
+import androidx.lifecycle.ViewModelProvider;
+
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,7 +20,8 @@ import android.widget.Toast;
 import java.util.Random;
 
 public class GameActivity extends AppCompatActivity implements View.OnClickListener {
-    private int score = -1;
+    private GameActivityViewModel model;
+
     private TextView titleTextView;
     private TextView scoreTextView;
 
@@ -30,14 +34,19 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+        model = new ViewModelProvider(this).get(GameActivityViewModel.class);
+        LiveData<Integer> integerLiveData = model.setScore();
+        integerLiveData.observe(this, new Observer<Integer>() {
+            @Override
+            public void onChanged(Integer integer) {
+                scoreTextView.setText(String.valueOf(integer));
+            }
+        });
         init();
         setEnabledFalseAndVisibilityInvisible();
-
     }
 
     private void init() {
-
-
         titleTextView = findViewById(R.id.titleTextView);
         scoreTextView = findViewById(R.id.scoreTextView);
         oneButtonRowCount1 = findViewById(R.id.oneButtonRowCount1);
@@ -56,7 +65,6 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         twoButtonRowCount4 = findViewById(R.id.twoButtonRowCount4);
         threeButtonRowCount4 = findViewById(R.id.threeButtonRowCount4);
         forButtonRowCount4 = findViewById(R.id.forButtonRowCount4);
-
         oneButtonRowCount1.setOnClickListener(this);
         twoButtonRowCount1.setOnClickListener(this);
         threeButtonRowCount1.setOnClickListener(this);
@@ -75,17 +83,16 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
         forButtonRowCount4.setOnClickListener(this);
     }
 
-// клик по кнопкам
+    // клик по кнопкам
     @Override
     public void onClick(View v) {
-        score++;
-        scoreTextView.setText(score+"");
+
+       model.getIncreasedValue();
 
         setEnabledFalseAndVisibilityInvisible();
         setVisibilityAndEnable();
     }
 
-    //
     private void setEnabledFalseAndVisibilityInvisible() {
         oneButtonRowCount1.setEnabled(false);
         twoButtonRowCount1.setEnabled(false);
@@ -214,24 +221,22 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
     // промах по кнопке
     public void missClick(View view) {
-        score -= 2;
-        if (score<0)score = 0;
-        scoreTextView.setText(score+"");
+        model.getDecreasedValue();
     }
 
     // запуск таймера
     public void runTimer(View view) {
-        score=0;
+        model.getBeginValue();
         titleTextView.setEnabled(false);
         setEnabledFalseAndVisibilityInvisible();
         setVisibilityAndEnable();
-        MyTimer myTimer = new MyTimer(30000,1000);
+        MyTimer myTimer = new MyTimer(30000, 1000);
         myTimer.start();
 
     }
 
     // таймер
-    private class MyTimer extends CountDownTimer{
+    private class MyTimer extends CountDownTimer {
 
 
         public MyTimer(long millisInFuture, long countDownInterval) {
@@ -240,9 +245,9 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void onTick(long millisUntilFinished) {
-            int seconds = (int) (millisUntilFinished/1000);
-            if (seconds<10) titleTextView.setText("00:0" +seconds);
-            else titleTextView.setText("00:"+seconds);
+            int seconds = (int) (millisUntilFinished / 1000);
+            if (seconds < 10) titleTextView.setText("00:0" + seconds);
+            else titleTextView.setText("00:" + seconds);
 
         }
 
@@ -251,7 +256,7 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
 
             setEnabledFalseAndVisibilityInvisible();
             titleTextView.setEnabled(true);
-            titleTextView.setText("Баллы: "+score );
+            titleTextView.setText("Баллы: " + model.getScore());
             Toast.makeText(GameActivity.this, "Finish", Toast.LENGTH_SHORT).show();
         }
     }
@@ -265,9 +270,8 @@ public class GameActivity extends AppCompatActivity implements View.OnClickListe
     // Делаем первый запуск
     @Override
     public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        Toast.makeText(this, "ajaahhaha", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(GameActivity.this, MainActivity.class);
-        intent.putExtra("isFirstStart",true);
+        intent.putExtra("isFirstStart", true);
         startActivity(intent);
         return super.onOptionsItemSelected(item);
     }
